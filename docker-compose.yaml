@@ -59,7 +59,7 @@ services:
       start_period: 1m
     volumes:
       #- /usr/local/tomcat/alf_data
-      - ./services/content/alfresco-global.properties:/usr/local/tomcat/shared/classes/alfresco-global.properties
+      - ./data/services/content/alfresco-global.properties:/usr/local/tomcat/shared/classes/alfresco-global.properties
     extends:
       file: commons/base.yaml
       service: alfresco
@@ -201,3 +201,50 @@ services:
     extends:
       file: commons/base.yaml
       service: proxy
+  ##########CUSTOM SERVICES BELOW##########
+  dozzle:
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9999:8080
+  queryalfapi:
+    image: wildsdocker/queryalfapi:v3
+    ports:
+      - 9600:9600
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 8G
+        reservations:
+          memory: 0G
+    volumes:
+      # downloaded shards
+      - ./data/services/queryalfapi/LLMs/:/root/.cache/
+      # map to static folder namely where swagger json is located
+      - ./data/services/queryalfapi/static/:/python-docker/static
+    #depends_on:
+    #alfresco:
+    #condition: service_healthy
+    environment:
+      BASE_URL: "http://alfresco:8080"
+      API_URL: "/static/swagger.json"
+      user: "admin"
+      pass: "admin"
+      devpath: "../src/assets/"
+      prodpath: "./static/"
+      port: "9600"
+      elasticapikey: "local"
+      elastichost: "http://elasticsearch:9200"
+      elasticcloudid: "123445"
+      elasticuser: "enterprise_search"
+      elasticpassword: "hylandforce1"
+      baseFilePlanID: ""
+      baseFilePlanQuery: '{"query": {"query": "select * from rma:filePlan","language": "cmis"}}'
+      OPEN_API_KEY: ""
+      HUGGING_FACE_HUB_TOKEN: ""
+      microsoft_model: "microsoft/Florence-2-base"
+      llama_vision_model: "unsloth/Llama-3.2-11B-Vision-Instruct"
+      llama_chat_repo: "hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF"
+      llama_chat_filename: "llama-3.2-3b-instruct-q4_k_m.gguf"
