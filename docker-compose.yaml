@@ -248,3 +248,19 @@ services:
       llama_vision_model: "unsloth/Llama-3.2-11B-Vision-Instruct"
       llama_chat_repo: "hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF"
       llama_chat_filename: "llama-3.2-3b-instruct-q4_k_m.gguf"
+  wildsalfmcp:
+    image: wildsdocker/wildsalfmcp:v1
+    ports:
+      - 8000:8000
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 0G
+        reservations:
+          memory: 0G
+    environment:
+      BASE_URL: "http://alfresco:8080"
+      user: "admin"
+      pass: "admin"
+      FASTMCP_HOST: 0.0.0.0
