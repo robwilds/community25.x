@@ -7,10 +7,19 @@
 # More details here:
 # https://www.oracle.com/technetwork/java/javase/10-relnote-issues-4108729.html
 #
+# This Docker Compose file will spin up an ACS community installation on a local host.
+# It requires at least 6GB of memory available to distribute among containers.
+#
+# For performance tuning, increase each container mem_limit and give a percentage of
+# it to the JVM. Use either the -Xms,-Xmx flags or the newly added flags in
+# java 10+: -XX:MaxRAMPercentage and -XX:MinRAMPercentage.
+# More details here:
+# https://www.oracle.com/technetwork/java/javase/10-relnote-issues-4108729.html
+#
 services:
   alfresco:
-    #image: docker.io/alfresco/alfresco-content-repository-community:25.1.0
-    image: docker.io/alfresco/alfresco-governance-repository-community:25.1.0
+    #image: docker.io/alfresco/alfresco-content-repository-community:25.2.0
+    image: docker.io/alfresco/alfresco-governance-repository-community:25.2.0
     mem_limit: 1900m
     environment:
       JAVA_TOOL_OPTIONS: >-
@@ -58,13 +67,12 @@ services:
       retries: 5
       start_period: 1m
     volumes:
-      #- /usr/local/tomcat/alf_data
-      - ./data/services/content/alfresco-global.properties:/usr/local/tomcat/shared/classes/alfresco-global.properties
+      - /usr/local/tomcat/alf_data
     extends:
       file: commons/base.yaml
       service: alfresco
   transform-core-aio:
-    image: alfresco/alfresco-transform-core-aio:5.1.7
+    image: alfresco/alfresco-transform-core-aio:5.2.0
     mem_limit: 1536m
     environment:
       JAVA_OPTS: >-
@@ -82,7 +90,8 @@ services:
       activemq:
         condition: service_healthy
   share:
-    image: docker.io/alfresco/alfresco-governance-share-community:25.1.0
+    #image: docker.io/alfresco/alfresco-share:25.2.0
+    image: docker.io/alfresco/alfresco-governance-share-community:25.2.0
     mem_limit: 1g
     environment:
       CSRF_FILTER_ORIGIN: http://localhost:8080
@@ -125,7 +134,7 @@ services:
       retries: 3
       start_period: 5s
   solr6:
-    image: docker.io/alfresco/alfresco-search-services:2.0.15
+    image: docker.io/alfresco/alfresco-search-services:2.0.16
     mem_limit: 2g
     environment:
       # Solr needs to know how to register itself with Alfresco
@@ -168,7 +177,7 @@ services:
       retries: 5
       start_period: 5s
   content-app:
-    image: alfresco/alfresco-content-app:6.0.0
+    image: alfresco/alfresco-content-app:7.0.0
     mem_limit: 128m
     environment:
       APP_BASE_SHARE_URL: "http://localhost:8080/aca/#/preview/s"
@@ -182,7 +191,7 @@ services:
       file: commons/base.yaml
       service: content-app
   control-center:
-    image: quay.io/alfresco/alfresco-control-center:9.4.0
+    image: quay.io/alfresco/alfresco-control-center:10.0.0
     mem_limit: 128m
     environment:
       APP_CONFIG_PROVIDER: "ECM"
