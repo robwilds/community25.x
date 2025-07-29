@@ -298,22 +298,15 @@ services:
     image: ghcr.io/open-webui/mcpo:main
     container_name: mcpo
     ports:
-      - 8000:8000
+      - 8001:8000
     command: mcpo --server-type "sse" -- http://wildsalfmcp:8000/sse
     restart: unless-stopped
     depends_on:
       - wildsalfmcp # Ensures the mcp server starts before mcpo server otherwise it will crash
   wildsalfmcp:
     image: wildsdocker/wildsalfmcp:v1
-    #ports:
-    #  - 8000:8000
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 0G
-        reservations:
-          memory: 0G
+    ports:
+      - 8000:8000
     environment:
       BASE_URL: "http://alfresco:8080"
       user: "admin"
