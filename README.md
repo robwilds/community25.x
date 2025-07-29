@@ -13,3 +13,5 @@ Pretty straight forward...
 ### note
 
 There's a container called wildsalfmcp that will start up an MCP server for use with coPilot or Clause desktop etc.
+
+If you want to run a local model with a dedicated chat client, you must install ollama on your computer. Once installed pull a model in terminal (ollama pull llama3). The start (or restart) the doocker services. You can access the open-webui interface with http://localhost:3000. Configure the tools under settings to point to http://localhost:8001
