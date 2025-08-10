@@ -284,7 +284,6 @@ services:
   #   restart: unless-stopped
   #   entrypoint: ["/usr/bin/bash", "/entrypoint.sh"]
   open-webui:
-    container_name: open-webui
     image: ghcr.io/open-webui/open-webui:main # Or :cuda for GPU support
     ports:
       - "3000:8080" # Host_port:Container_port
@@ -299,7 +298,6 @@ services:
       - mcpo
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
-    container_name: mcpo
     ports:
       - 8001:8000
     command: mcpo --server-type "sse" -- http://wildsalfmcp:8000/sse
@@ -314,6 +312,43 @@ services:
       user: "admin"
       pass: "admin"
       FASTMCP_HOST: 0.0.0.0
+  email:
+    image: apache/james:latest
+    mem_limit: 768m
+    ports:
+      - "2525:25"
+      - "110:110"
+      - "143:143"
+      - "465:465"
+      - "587:587"
+      - "993:993"
+      - "8300:8300"
+    # depends_on:
+    #   - ldap
+    volumes:
+      - ./data/services/email/smtpserver.xml:/root/conf/smtpserver.xml
+      - ./data/services/email/webadmin.properties:/root/conf/webadmin.properties
+      - ./data/services/email/imapserver.xml:/root/conf/imapserver.xml
+      - ./data/services/email/mailrepositorystore.xml:/root/conf/mailrepositorystore.xml
+      # Var storage for the root user
+      - email_var:/root/var/
+      # Storage for the Apache James server
+      - email_store:/var/store/
+      - email_config:/root/conf
+    logging:
+      options:
+        max-size: "200k"
+        max-file: "10"
+  rainloop:
+    mem_limit: 768m
+    image: ghcr.io/xrstf/rainloop
+    ports:
+      - 8888:80
+    volumes:
+      - ./data/services/rainloop:/var/lib/rainloop/data
 volumes:
   alf_data:
   postgresdata:
+  email_var:
+  email_store:
+  email_config:
