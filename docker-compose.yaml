@@ -198,6 +198,8 @@ services:
     extends:
       file: commons/base.yaml
       service: content-app
+    profiles:
+      - donotstart
   control-center:
     image: quay.io/alfresco/alfresco-control-center:10.0.0
     mem_limit: 128m
@@ -214,6 +216,8 @@ services:
     extends:
       file: commons/base.yaml
       service: control-center
+    profiles:
+      - donotstart
   proxy:
     extends:
       file: commons/base.yaml
@@ -266,23 +270,7 @@ services:
       llama_chat_repo: "hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF"
       llama_chat_filename: "llama-3.2-3b-instruct-q4_k_m.gguf"
     profiles:
-      - disabled
-  # ollama:
-  #   container_name: ollama
-  #   image: ollama/ollama
-  #   ports:
-  #     - "11434:11434" # Default Ollama port
-  #   volumes:
-  #     - ./data/services/ollama/:/root/.ollama
-  #     - ./data/services/ollama/entrypoint.sh:/entrypoint.sh
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 24G
-  #       reservations:
-  #         memory: 8G
-  #   restart: unless-stopped
-  #   entrypoint: ["/usr/bin/bash", "/entrypoint.sh"]
+      - donotstart
   open-webui:
     image: ghcr.io/open-webui/open-webui:main # Or :cuda for GPU support
     ports:
@@ -290,19 +278,18 @@ services:
     volumes:
       - ./data/services/openwebui:/app/backend/data # Persistent storage for Open WebUI data
     environment:
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434 # Link to the Ollama service
-    # depends_on:
-    #   - ollama # Ensures Ollama starts before Open WebUI
-    restart: on-failure:5
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434 # Link to the Ollama service on the host
+    restart: on-failure:20
     depends_on:
       - mcpo
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
     ports:
       - 8001:8000
-    command: mcpo --server-type "sse" -- http://wildsalfmcp:8000/sse
+    command: mcpo --server-type "streamable-http" -- http://wildsalfmcp:8000/mcp
     depends_on:
-      - wildsalfmcp # Ensures the mcp server starts before mcpo server otherwise it will crash
+      wildsalfmcp:
+        condition: service_healthy # Ensures the mcp server starts before mcpo server otherwise it will crash
   wildsalfmcp:
     image: wildsdocker/wildsalfmcp:v1
     ports:
@@ -312,43 +299,62 @@ services:
       user: "admin"
       pass: "admin"
       FASTMCP_HOST: 0.0.0.0
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  ldap:
+    image: bitnami/openldap:latest
+    ports:
+      - 389:389
+      - 636:636
+    environment:
+      - LDAP_PORT_NUMBER=389
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=admin
+      - LDAP_ADMIN_DN=cn=admin,dc=example,dc=com
+      - LDAP_ROOT=dc=example,dc=com
+      - LDAP_USERS=demo
+      - LDAP_PASSWORDS=demo
+      - LDAP_PASSWORD_HASH={CLEARTEXT}
+      - LDAP_CUSTOM_LDIF_DIR=/home
+    volumes:
+      - ./data/services/bitnamildap:/bitnami/openldap
+      - type: bind
+        source: ./data/services/bitnamildap/init.ldif
+        target: /home/init.ldif
+  ldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap
+      - PHPLDAPADMIN_HTTPS=false
+    ports:
+      - 6443:443
+      - 8400:80
   email:
-    image: apache/james:latest
-    mem_limit: 768m
+    #image: apache/james:memory-latest
+    image: apache/james:demo-3.8.2
     ports:
-      - "2525:25"
-      - "110:110"
-      - "143:143"
-      - "465:465"
-      - "587:587"
-      - "993:993"
-      - "8300:8300"
-    # depends_on:
-    #   - ldap
+      - 25:25
+      - 465:465
+      - 993:993
+      - 143:143
+      - 8500:8000
     volumes:
-      - ./data/services/email/smtpserver.xml:/root/conf/smtpserver.xml
-      - ./data/services/email/webadmin.properties:/root/conf/webadmin.properties
-      - ./data/services/email/imapserver.xml:/root/conf/imapserver.xml
-      - ./data/services/email/mailrepositorystore.xml:/root/conf/mailrepositorystore.xml
-      # Var storage for the root user
-      - email_var:/root/var/
-      # Storage for the Apache James server
-      - email_store:/var/store/
-      - email_config:/root/conf
-    logging:
-      options:
-        max-size: "200k"
-        max-file: "10"
-  rainloop:
-    mem_limit: 768m
-    image: ghcr.io/xrstf/rainloop
+      #- ./data/services/email/domainlist.xml:/root/conf/domainlist.xml
+      - ./data/services/email/initialdata.sh:/root/initialdata.sh
+      - type: bind
+        source: ./data/services/email/derby/
+        target: /var/store/
+  webmail:
+    image: hardware/rainloop:latest
+    volumes:
+      - ./data/services/webmail:/rainloop/data
     ports:
-      - 8890:80
-    volumes:
-      - ./data/services/rainloop:/var/lib/rainloop/data
+      - 8800:8888
+    depends_on:
+      - email
 volumes:
   alf_data:
   postgresdata:
-  email_var:
-  email_store:
-  email_config:

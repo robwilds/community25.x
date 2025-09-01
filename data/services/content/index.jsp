@@ -77,12 +77,6 @@ alfrescoContext.getRequestDispatcher("/AosResponder_ServerRoot"); if(rd != null)
           <p></p>
 
           <h2>Customizations</h2>
-          <!--p><a href="" onclick="window.open('http://'+ window.location.hostname + ':5601')">Kibana Reporting</a></p>
-          <p></p>
-          <p><a href="" onclick="window.open('http://'+ window.location.hostname + ':4200')">Weapons Detection (ADF)</a></p>
-          <p></p>
-          <p><a href="/fileplanupload" target="_blank">File Plan Upload (ADW5)</a></p>
-          <p></p-->
           <p>
             <a
               href=""
@@ -103,9 +97,27 @@ alfrescoContext.getRequestDispatcher("/AosResponder_ServerRoot"); if(rd != null)
             <a
               href=""
               onclick="window.open('http://'+ window.location.hostname + ':8001/docs')"
-              >MCP Server for Alfresco</a
+              >MCP openai Server for Alfresco</a
             >
           </p>
+          <p></p>
+          <p>
+            <a
+              href=""
+              onclick="window.open('http://'+ window.location.hostname + ':8400')"
+              >LDAP config</a
+            >
+          </p>
+          <p></p>
+          <p>
+            <a
+              href=""
+              onclick="window.open('http://'+ window.location.hostname + ':8800')"
+              >Email Client</a
+            >
+          </p>
+          <iframe src="http://localhost:9999" width="50%" height="300"></iframe>
+
           <% } else { %>
           <p>
             <b>Cannot find Alfresco Repository on this server.</b> (Does this
