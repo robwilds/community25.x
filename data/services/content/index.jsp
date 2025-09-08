@@ -116,7 +116,6 @@ alfrescoContext.getRequestDispatcher("/AosResponder_ServerRoot"); if(rd != null)
               >Email Client</a
             >
           </p>
-          <iframe src="http://localhost:9999" width="50%" height="300"></iframe>
 
           <% } else { %>
           <p>
@@ -128,6 +127,8 @@ alfrescoContext.getRequestDispatcher("/AosResponder_ServerRoot"); if(rd != null)
           <% } %>
         </div>
       </div>
+      <iframe src="http://localhost:9999" width="100%" height="100%"></iframe>
+
       <div class="push"></div>
     </div>
     <div class="footer">
