@@ -16,7 +16,6 @@
 # More details here:
 # https://www.oracle.com/technetwork/java/javase/10-relnote-issues-4108729.html
 #
-version: "3.8"
 services:
   alfresco:
     #image: docker.io/alfresco/alfresco-content-repository-community:25.2.0
@@ -56,6 +55,7 @@ services:
         -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
         -Ddeployment.method=DOCKER_COMPOSE
         -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+        -DlocalTransform.pdf-pii.url=http://transform-pii:8090/
         -XX:MinRAMPercentage=50
         -XX:MaxRAMPercentage=80
     healthcheck:
@@ -79,6 +79,7 @@ services:
       service: alfresco
   transform-core-aio:
     image: alfresco/alfresco-transform-core-aio:5.2.0
+    #image: alfresco-tengine-pii
     mem_limit: 1536m
     environment:
       JAVA_OPTS: >-
@@ -223,6 +224,8 @@ services:
       file: commons/base.yaml
       service: proxy
   ##########CUSTOM SERVICES BELOW##########
+  # transform-pii:
+  #   image: alfresco/transform-pii-redaction
   dozzle:
     image: amir20/dozzle:latest
     volumes:
@@ -281,6 +284,8 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434 # Link to the Ollama service on the host
     depends_on:
       - mcpo
+    profiles:
+      - donotstart
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
     ports:
@@ -289,6 +294,8 @@ services:
     depends_on:
       wildsalfmcp:
         condition: service_healthy # Ensures the mcp server starts before mcpo server otherwise it will crash
+    profiles:
+      - donotstart
   wildsalfmcp:
     image: wildsdocker/wildsalfmcp:v1
     ports:
@@ -303,8 +310,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    profiles:
+      - donotstart
   ldap:
-    image: bitnami/openldap:latest
+    image: bitnamilegacy/openldap:latest
     ports:
       - 389:389
       - 636:636
@@ -331,6 +340,8 @@ services:
     ports:
       - 6443:443
       - 8400:80
+    profiles:
+      - donotstart
   email:
     #image: apache/james:memory-latest
     image: apache/james:demo-3.8.2
@@ -346,6 +357,8 @@ services:
       - type: bind
         source: ./data/services/email/derby/
         target: /var/store/
+    profiles:
+      - donotstart
   webmail:
     image: hardware/rainloop:latest
     volumes:
@@ -354,6 +367,8 @@ services:
       - 8800:8888
     depends_on:
       - email
+    profiles:
+      - donotstart
 volumes:
   alf_data:
   postgresdata:
