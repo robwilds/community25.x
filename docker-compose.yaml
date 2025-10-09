@@ -232,6 +232,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 9999:8080
+    profiles:
+      - donotstart
   queryalfapi:
     image: wildsdocker/queryalfapi:v3
     ports:
