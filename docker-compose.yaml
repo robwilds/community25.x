@@ -299,9 +299,11 @@ services:
     profiles:
       - donotstart
   wildsalfmcp:
-    image: wildsdocker/wildsalfmcp:v1
+    image: wildsdocker/wildsalfmcp:v2
     ports:
       - 8000:8000
+      - 8443:443
+      - 8880:80
     environment:
       BASE_URL: "http://alfresco:8080"
       user: "admin"
