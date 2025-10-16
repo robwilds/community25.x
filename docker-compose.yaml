@@ -314,8 +314,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    profiles:
-      - donotstart
+    #profiles:
+    #- donotstart
   ldap:
     image: bitnamilegacy/openldap:latest
     ports:
