@@ -2,4 +2,4 @@
 !/data/services/ollama/entrypoint.sh
 **/ollama/models
 **/ollama/id_*
-**/openwebui
+#**/openwebui
