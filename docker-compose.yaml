@@ -284,10 +284,10 @@ services:
       - ./data/services/openwebui:/app/backend/data # Persistent storage for Open WebUI data
     environment:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434 # Link to the Ollama service on the host
-    depends_on:
-      - mcpo
-    profiles:
-      - donotstart
+    #depends_on:
+    #  - mcpo
+    #profiles:
+    #  - donotstart
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
     ports:
