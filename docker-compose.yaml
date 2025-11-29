@@ -19,7 +19,7 @@
 services:
   alfresco:
     #image: docker.io/alfresco/alfresco-content-repository-community:25.2.0
-    image: docker.io/alfresco/alfresco-governance-repository-community:25.2.0
+    image: docker.io/alfresco/alfresco-governance-repository-community:25.3.0
     mem_limit: 1900m
     environment:
       JAVA_TOOL_OPTIONS: >-
@@ -78,7 +78,7 @@ services:
       file: commons/base.yaml
       service: alfresco
   transform-core-aio:
-    image: alfresco/alfresco-transform-core-aio:5.2.2
+    image: alfresco/alfresco-transform-core-aio:5.2.4
     #image: alfresco-tengine-pii
     mem_limit: 1536m
     environment:
@@ -98,7 +98,7 @@ services:
         condition: service_healthy
   share:
     #image: docker.io/alfresco/alfresco-share:25.2.0
-    image: docker.io/alfresco/alfresco-governance-share-community:25.2.0
+    image: docker.io/alfresco/alfresco-governance-share-community:25.3.0
     mem_limit: 1g
     environment:
       CSRF_FILTER_ORIGIN: http://localhost:8080
@@ -186,7 +186,7 @@ services:
       retries: 5
       start_period: 5s
   content-app:
-    image: alfresco/alfresco-content-app:7.1.0
+    image: alfresco/alfresco-content-app:7.2.0
     mem_limit: 128m
     environment:
       APP_BASE_SHARE_URL: "http://localhost:8080/aca/#/preview/s"
@@ -202,7 +202,7 @@ services:
     profiles:
       - donotstart
   control-center:
-    image: quay.io/alfresco/alfresco-control-center:10.1.0
+    image: quay.io/alfresco/alfresco-control-center:10.2.0
     mem_limit: 128m
     environment:
       APP_CONFIG_PROVIDER: "ECM"
