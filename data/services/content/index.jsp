@@ -61,6 +61,8 @@ alfrescoContext.getRequestDispatcher("/AosResponder_ServerRoot"); if(rd != null)
           <p></p>
           <p><a href="/share" target="_blank">Share</a></p>
           <p></p>
+          <p><a href="/control-center" target="_blank">Control Center</a></p>
+          <p></p>
           <!--p><a href="/activiti-app" target="_blank">Process Services</a></a></p>
           <p></p>
           <p><a href="/activiti-admin" target="_blank">Process Admin</a></a></p>
