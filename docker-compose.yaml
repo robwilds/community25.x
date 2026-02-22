@@ -299,7 +299,7 @@ services:
     profiles:
       - donotstart
   wildsalfmcp:
-    image: wildsdocker/wildsalfmcp:v2
+    image: wildsdocker/wildsalfmcp:v3
     ports:
       - 8000:8000
       - 8443:443
